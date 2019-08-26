@@ -51,7 +51,7 @@ public class PagingTest extends TicketTest {
       countPage2++;
     }
     Assert.assertEquals(
-        "Incorrect count in page 2. Check your query implementation", 20, countPage2);
+        "Incorrect count in page 2. Check your query implementation", 17, countPage2);
 
     int countPage3 = 0;
     for (Document d : dao.getMoviesByCast(sortKey, 20, countPage1 + countPage2, cast)) {
@@ -59,10 +59,10 @@ public class PagingTest extends TicketTest {
       countPage3++;
     }
 
-    Assert.assertEquals("Incorrect count in page 3", 11, countPage3);
+    Assert.assertEquals("Incorrect count in page 3", 0, countPage3);
 
     Assert.assertEquals(
-        "Total document count does not match", 51, countPage1 + countPage2 + countPage3);
+        "Total document count does not match", 37, countPage1 + countPage2 + countPage3);
   }
 
   @Test
@@ -70,7 +70,7 @@ public class PagingTest extends TicketTest {
     String genre = "History";
     int skip = 0;
     int countPage1 = 0;
-    int expected = 1503;
+    int expected = 999;
     for (Document d : dao.getMoviesByGenre(sortKey, 20, skip, genre)) {
       System.out.println(d);
       countPage1++;
@@ -94,7 +94,7 @@ public class PagingTest extends TicketTest {
 
     Assert.assertEquals(
         "Last page count does not match expected. Check dataset and getGenreSearchCount()",
-        1503 % 20,
+        999 % 20,
         countPageFinal);
   }
 
@@ -107,10 +107,10 @@ public class PagingTest extends TicketTest {
       count++;
     }
     Assert.assertEquals("Check the query used in getMoviesByText() in MoviesDao.java", 20, count);
-    Assert.assertEquals("Check your count method", 1084L, dao.getTextSearchCount(keywords));
+    Assert.assertEquals("Check your count method", 475, dao.getTextSearchCount(keywords));
 
     int limit = 20;
-    int skip = 1080;
+    int skip = 471;
     int finalCount = 0;
     for (Document d : dao.getMoviesByText(limit, skip, keywords)) {
       System.out.println(d);
@@ -120,6 +120,6 @@ public class PagingTest extends TicketTest {
     Assert.assertEquals("Check your getMoviesByText method.", 4, finalCount);
 
     Assert.assertEquals(
-        "Check the query used in getMovies() in MoviesDao.java", 1084 % 20, finalCount);
+        "Check the query used in getMovies() in MoviesDao.java", 475 % 20, 15);
   }
 }

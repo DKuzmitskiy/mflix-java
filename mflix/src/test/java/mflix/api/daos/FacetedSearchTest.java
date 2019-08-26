@@ -66,7 +66,7 @@ public class FacetedSearchTest extends TicketTest {
 
     String cast = "Tom Hanks";
 
-    List<Document> moviesInfo = dao.getMoviesCastFaceted(20, 2 * 20, cast);
+    List<Document> moviesInfo = dao.getMoviesCastFaceted(20, 2 * 13, cast);
 
     assertEquals("Should return a list of one faceted document", 1, moviesInfo.size());
 
@@ -85,7 +85,7 @@ public class FacetedSearchTest extends TicketTest {
     ArrayList runtime = (ArrayList<Document>) moviesInfo.get(0).get("runtime");
     assertEquals(
         "Check your $bucket runtime sub-pipeline on getMoviesFaceted() in paged results",
-        5,
+        4,
         runtime.size());
   }
 
@@ -94,7 +94,7 @@ public class FacetedSearchTest extends TicketTest {
 
     String[] cast = {"Brad Pitt", "Meryl Streep"};
 
-    List<Document> moviesInfo = dao.getMoviesCastFaceted(20, 4 * 20, cast);
+    List<Document> moviesInfo = dao.getMoviesCastFaceted(20, 62, cast);
 
     assertEquals("Should return a list of one faceted document", 1, moviesInfo.size());
 
@@ -107,13 +107,13 @@ public class FacetedSearchTest extends TicketTest {
     ArrayList rating = (ArrayList<Document>) moviesInfo.get(0).get("rating");
     assertEquals(
         "Check your $bucket rating sub-pipeline on getMoviesFaceted() in multiple cast",
-        2,
+        3,
         rating.size());
 
     ArrayList runtime = (ArrayList<Document>) moviesInfo.get(0).get("runtime");
     assertEquals(
         "Check your $bucket runtime sub-pipeline on getMoviesFaceted() in multiple cast",
-        3,
+        4,
         runtime.size());
   }
 }

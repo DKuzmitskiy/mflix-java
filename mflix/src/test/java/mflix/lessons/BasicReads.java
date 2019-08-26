@@ -118,7 +118,7 @@ public class BasicReads extends AbstractLesson {
     moviesCollection.find(queryFilter).into(results);
 
     // from previously exploring the dataset, we expect 29 results
-    int expectedResultsSize = 29;
+    int expectedResultsSize = 21;
     Assert.assertEquals(expectedResultsSize, results.size());
 
     // let's look at one of the documents now

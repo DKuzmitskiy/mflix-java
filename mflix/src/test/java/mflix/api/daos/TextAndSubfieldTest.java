@@ -67,7 +67,7 @@ public class TextAndSubfieldTest extends TicketTest {
 
   @Test
   public void testTextSearchCount() {
-    long expected = 326;
+    long expected = 151;
     String keywords = "dress";
 
     Assert.assertEquals(
@@ -119,7 +119,7 @@ public class TextAndSubfieldTest extends TicketTest {
 
     Assert.assertEquals(
         "Total count of movies with cast does not match. Check your query filter",
-        75,
+        62,
         dao.getCastSearchCount(cast.toArray(new String[0])));
   }
 
@@ -139,7 +139,7 @@ public class TextAndSubfieldTest extends TicketTest {
     }
 
     assertTrue("getMoviesByGenre should be returning documents", numMovies > 0);
-    assertEquals(8385, dao.getGenresSearchCount(garray));
+    assertEquals(3805, dao.getGenresSearchCount(garray));
   }
 
   @Test
@@ -157,7 +157,7 @@ public class TextAndSubfieldTest extends TicketTest {
     assertTrue("getMoviesByGenre should be returning documents", numMovies > 0);
     assertEquals(
         "Number of total documents does not match expected. Check your dataset",
-        5917,
+        2539,
         dao.getGenresSearchCount(genre));
   }
 }
