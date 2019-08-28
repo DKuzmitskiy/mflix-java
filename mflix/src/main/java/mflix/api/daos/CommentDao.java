@@ -1,16 +1,20 @@
 package mflix.api.daos;
 
 import com.mongodb.MongoClientSettings;
+import com.mongodb.ReadConcern;
+import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import mflix.api.models.Comment;
 import mflix.api.models.Critic;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +23,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
+import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Sorts.descending;
 import static com.mongodb.client.model.Updates.set;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -37,6 +46,8 @@ public class CommentDao extends AbstractMFlixDao {
 
   private final Logger log;
 
+  private MongoCollection<Critic> criticCollection;
+
   @Autowired
   public CommentDao(
       MongoClient mongoClient, @Value("${spring.mongodb.database}") String databaseName) {
@@ -49,6 +60,9 @@ public class CommentDao extends AbstractMFlixDao {
             fromProviders(PojoCodecProvider.builder().automatic(true).build()));
     this.commentCollection =
         db.getCollection(COMMENT_COLLECTION, Comment.class).withCodecRegistry(pojoCodecRegistry);
+
+    this.criticCollection =
+            db.getCollection(COMMENT_COLLECTION, Critic.class).withCodecRegistry(pojoCodecRegistry);
   }
 
   /**
@@ -132,6 +146,22 @@ public class CommentDao extends AbstractMFlixDao {
    * @return true if successful deletes the comment.
    */
   public boolean deleteComment(String commentId, String email) {
+    if (commentId == null) {
+      throw new IncorrectDaoOperation("Write exception when given a wrong commentId");
+    }
+    Document filter = new Document("_id", new ObjectId(commentId));
+    filter.append("email", email);
+    try {
+
+      DeleteResult deleteResult = commentCollection.deleteOne(filter);
+      if (deleteResult.getDeletedCount() == 1) {
+        log.info("Comment is deleted...");
+        return true;
+      }
+      log.info("Something go wrong...");
+    } catch (Exception e) {
+      log.error(e.getLocalizedMessage());
+    }
     // TODO> Ticket Delete Comments - Implement the method that enables the deletion of a user
     // comment
     // TIP: make sure to match only users that own the given commentId
@@ -155,6 +185,12 @@ public class CommentDao extends AbstractMFlixDao {
     // // guarantee for the returned documents. Once a commenter is in the
     // // top 20 of users, they become a Critic, so mostActive is composed of
     // // Critic objects.
+
+    List<Bson> pipeline = Arrays.asList(group("$email", sum("count", 1L)),
+            sort(descending("count")),
+            limit(20));
+    AggregateIterable<Critic> critics = criticCollection.withReadConcern(ReadConcern.MAJORITY).aggregate(pipeline);
+    critics.forEach((Consumer<? super Critic>) mostActive::add);
     return mostActive;
   }
 }
