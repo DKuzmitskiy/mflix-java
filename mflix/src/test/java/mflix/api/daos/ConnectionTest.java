@@ -40,7 +40,7 @@ public class ConnectionTest extends TicketTest {
 
   @Test
   public void testMoviesCount() {
-    long expected = 45993;
+    long expected = 23539;
     Assert.assertEquals("Check your connection string", expected, dao.getMoviesCount());
   }
 

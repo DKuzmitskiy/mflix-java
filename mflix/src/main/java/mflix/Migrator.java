@@ -93,7 +93,7 @@ public class Migrator {
     // instantiate database and collection objects
     MongoDatabase mflix = MongoClients.create(mongoUri).getDatabase("mflix");
     MongoCollection<Document> movies = mflix.getCollection("movies");
-    String datePattern = "yyyy-MM-dd hh:mm:ss";
+    String datePattern = "yyyy-MM-dd hh:mm:ss.ms";
     // TODO> Ticket: Migration - create a query filter that finds all
     // documents that are required to be updated and the correct date
     // format pattern

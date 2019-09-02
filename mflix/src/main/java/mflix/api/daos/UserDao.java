@@ -55,12 +55,19 @@ public class UserDao extends AbstractMFlixDao {
    */
   public boolean addUser(User user) {
     //TODO > Ticket: Durable Writes -  you might want to use a more durable write concern here!
-    User user1 = usersCollection.find(Filters.eq("email", user.getEmail())).first();
-    if (user1 == null) {
+//    User user1 = usersCollection.find(Filters.eq("email", user.getEmail())).first();
+//    if (user1 == null) {
+//      usersCollection.withWriteConcern(WriteConcern.MAJORITY).insertOne(user);
+//      return true;
+//    }
+    try {
       usersCollection.withWriteConcern(WriteConcern.MAJORITY).insertOne(user);
+      return true;
+    } catch (Exception e) {
+      throw new IncorrectDaoOperation(e.getMessage());
     }
-    log.error("That user already exist");
-    return true;
+
+
     //TODO > Ticket: Handling Errors - make sure to only add new users
     // and not users that already exist.
 
